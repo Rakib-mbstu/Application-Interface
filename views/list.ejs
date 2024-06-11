@@ -30,7 +30,11 @@
           <tr>
             <td><%= element.name %></td>
             <td><%= element.proprietor %></td>
-            <td></td>
+            <td>
+              <a href="/approve/<%= element.id %>" class="btn btn-primary"
+                >Approve</a
+              >
+            </td>
           </tr>
           <% }) %>
         </tbody>

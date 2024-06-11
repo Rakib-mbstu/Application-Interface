@@ -10,6 +10,10 @@ const licenseSchema = new Schema({
     type: String,
     required: true,
   },
+  approved: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 module.exports = mongoose.model("license", licenseSchema);
