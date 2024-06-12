@@ -7,58 +7,54 @@ const { TextDecoder } = require("util");
 
 const channelName = envOrDefault("CHANNEL_NAME", "mychannel");
 const chaincodeName = envOrDefault("CHAINCODE_NAME", "basic");
-const mspId = envOrDefault("MSP_ID", "Org1MSP");
 
+//mspId
+let mspId = envOrDefault("MSP_ID", "Org1MSP");
 
 //dirName
-const cryptoPath = envOrDefault(
+let cryptoPath = envOrDefault(
   "CRYPTO_PATH",
   path.resolve(
     __dirname,
-    "..",
-    "..",
-    "..",
-    "..",
-    "test-network",
-    "organizations",
-    "peerOrganizations",
-    "org1.example.com"
+    "../../../../test-network/organizations/peerOrganizations/org1.example.com"
   )
 );
 
 //keyPath
-const keyDirectoryPath = envOrDefault(
+let keyDirectoryPath = envOrDefault(
   "KEY_DIRECTORY_PATH",
-  path.resolve(cryptoPath, "users", "User1@org1.example.com", "msp", "keystore")
+  path.resolve(cryptoPath, "users/User1@org1.example.com/msp/keystore")
 );
 
-
 //certPath
-const certDirectoryPath = envOrDefault(
+let certDirectoryPath = envOrDefault(
   "CERT_DIRECTORY_PATH",
-  path.resolve(
-    cryptoPath,
-    "users",
-    "User1@org1.example.com",
-    "msp",
-    "signcerts"
-  )
+  path.resolve(cryptoPath, "users/User1@org1.example.com/msp/signcerts")
 );
 
 //tlsPath
-const tlsCertPath = envOrDefault(
+let tlsCertPath = envOrDefault(
   "TLS_CERT_PATH",
-  path.resolve(cryptoPath, "peers", "peer0.org1.example.com", "tls", "ca.crt")
+  path.resolve(cryptoPath, "peers/peer0.org1.example.com/tls/ca.crt")
 );
 
 //peerPoint
-const peerEndpoint = envOrDefault("PEER_ENDPOINT", "localhost:7051");
+let peerEndpoint = envOrDefault("PEER_ENDPOINT", "localhost:7051");
 //peerHost
-const peerHostAlias = envOrDefault("PEER_HOST_ALIAS", "peer0.org1.example.com");
+let peerHostAlias = envOrDefault("PEER_HOST_ALIAS", "peer0.org1.example.com");
 
 const utf8Decoder = new TextDecoder();
 
-async function getLicenses() {
+async function getLicenses(newDataPath) {
+  console.log(newDataPath);
+  mspId = newDataPath.mspId;
+  cryptoPath = path.resolve(newDataPath.dirName);
+  keyDirectoryPath = path.resolve(cryptoPath, newDataPath.keyPath);
+  certDirectoryPath = path.resolve(cryptoPath, newDataPath.certPath);
+  tlsCertPath = path.resolve(cryptoPath, newDataPath.tlsPath);
+  peerEndpoint = newDataPath.peerPoint;
+  peerHostAlias = newDataPath.peerHost;
+
   await displayInputParameters();
 
   const client = await newGrpcConnection();
@@ -87,38 +83,6 @@ async function getLicenses() {
     await initLedger(contract);
     const data = await GetAllLicenses(contract);
     return data;
-  } finally {
-    gateway.close();
-    client.close();
-  }
-}
-
-async function createLicenseCall(id, name, proprietor, remarks) {
-  await displayInputParameters();
-  const client = await newGrpcConnection();
-
-  const gateway = connect({
-    client,
-    identity: await newIdentity(),
-    signer: await newSigner(),
-    evaluateOptions: () => {
-      return { deadline: Date.now() + 5000 };
-    },
-    endorseOptions: () => {
-      return { deadline: Date.now() + 15000 };
-    },
-    submitOptions: () => {
-      return { deadline: Date.now() + 5000 };
-    },
-    commitStatusOptions: () => {
-      return { deadline: Date.now() + 60000 };
-    },
-  });
-
-  try {
-    const network = gateway.getNetwork(channelName);
-    const contract = network.getContract(chaincodeName);
-    await createLicense(contract, id, name, proprietor, remarks);
   } finally {
     gateway.close();
     client.close();
@@ -203,4 +167,4 @@ async function displayInputParameters() {
   console.log(`peerHostAlias:     ${peerHostAlias}`);
 }
 
-module.exports = { getLicenses, createLicenseCall };
+module.exports = { getLicenses };

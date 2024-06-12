@@ -14,7 +14,8 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const cookie = require("cookie");
 const jwtSecret = process.env.jwtSecret;
-
+const cryptoPath = require("./server/models/cryptoPath");
+const dConnector = require("./server/crypto/dynamicConnector");
 //
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -138,6 +139,36 @@ app.post("/approve", authMiddleware, async (req, res) => {
   }
 });
 
+//addPath
+app.post("/addPath", async (req, res) => {
+  const { mspId, dirName, keyPath, certPath, tlsPath, peerPoint, peerHost } =
+    req.body;
+  try {
+    const newPath = new cryptoPath({
+      mspId: mspId,
+      dirName: dirName,
+      keyPath: keyPath,
+      certPath: certPath,
+      tlsPath: tlsPath,
+      peerPoint: peerPoint,
+      peerHost: peerHost,
+    });
+    await cryptoPath.create(newPath);
+    console.log(newPath);
+  } catch (e) {
+    res.send(e);
+  }
+  console.log(keyPath);
+  res.send("done");
+});
+
+app.get("/try", async (req, res) => {
+  const data = await cryptoPath.findById("666977c7b63ef75782c999b4");
+  console.log(data);
+  await dConnector.getLicenses(data);
+  console.log("okay");
+  res.send("done");
+});
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
