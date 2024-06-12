@@ -16,6 +16,7 @@ const cookie = require("cookie");
 const jwtSecret = process.env.jwtSecret;
 const cryptoPath = require("./server/models/cryptoPath");
 const dConnector = require("./server/crypto/dynamicConnector");
+const { runInNewContext } = require("vm");
 //
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -39,6 +40,7 @@ const authMiddleware = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, jwtSecret);
     req.userId = decoded.userId;
+    console.log(decoded.userId);
     next();
   } catch (error) {
     res.status(401).json({ message: "Unauthorized" });
@@ -46,7 +48,7 @@ const authMiddleware = (req, res, next) => {
 };
 
 // Route for the home page
-app.get("/", async (req, res) => {
+app.get(["/","/home"], async (req, res) => {
   //res.render("index", { title: "Home" });
   res.render("login");
 });
@@ -92,6 +94,7 @@ app.post("/login", async (req, res) => {
 //   }
 // });
 
+//list of non approved applications
 app.get("/list", authMiddleware, async (req, res) => {
   const data = await license.find({ approved: false });
   res.render("list", { data: data });
@@ -123,7 +126,6 @@ app.get("/approve/:id", authMiddleware, async (req, res) => {
     res.send(e);
   }
 });
-
 app.post("/approve", authMiddleware, async (req, res) => {
   const id = req.body.id;
   const name = req.body.name;
@@ -131,42 +133,41 @@ app.post("/approve", authMiddleware, async (req, res) => {
   const remarks = req.body.remarks;
   try {
     await license.findByIdAndUpdate(id, { approved: true });
-    await initCall.createLicenseCall(id, name, proprietor, remarks);
-    const see = await initCall.getLicenses();
-    res.send(see);
+    const dPath = await cryptoPath.findOne({ userId: req.userId });
+    await dConnector.createLicenseCall(dPath, id, name, proprietor, remarks);
+    res.render("appSuccess", { id, name, proprietor, remarks });
   } catch (e) {
     res.send(e);
   }
 });
 
 //addPath
-app.post("/addPath", async (req, res) => {
-  const { mspId, dirName, keyPath, certPath, tlsPath, peerPoint, peerHost } =
-    req.body;
-  try {
-    const newPath = new cryptoPath({
-      mspId: mspId,
-      dirName: dirName,
-      keyPath: keyPath,
-      certPath: certPath,
-      tlsPath: tlsPath,
-      peerPoint: peerPoint,
-      peerHost: peerHost,
-    });
-    await cryptoPath.create(newPath);
-    console.log(newPath);
-  } catch (e) {
-    res.send(e);
-  }
-  console.log(keyPath);
-  res.send("done");
-});
+// app.post("/addPath", async (req, res) => {
+//   const { mspId, dirName, keyPath, certPath, tlsPath, peerPoint, peerHost } =
+//     req.body;
+//   try {
+//     const newPath = new cryptoPath({
+//       mspId: mspId,
+//       dirName: dirName,
+//       keyPath: keyPath,
+//       certPath: certPath,
+//       tlsPath: tlsPath,
+//       peerPoint: peerPoint,
+//       peerHost: peerHost,
+//     });
+//     await cryptoPath.create(newPath);
+//     console.log(newPath);
+//   } catch (e) {
+//     res.send(e);
+//   }
+//   console.log(keyPath);
+//   res.send("done");
+// });
 
-app.get("/try", async (req, res) => {
+app.get("/showCertificates", async (req, res) => {
   const data = await cryptoPath.findById("666977c7b63ef75782c999b4");
   console.log(data);
   await dConnector.getLicenses(data);
-  console.log("okay");
   res.send("done");
 });
 // Start the server

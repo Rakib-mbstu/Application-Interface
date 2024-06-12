@@ -89,6 +89,46 @@ async function getLicenses(newDataPath) {
   }
 }
 
+async function createLicenseCall(newDataPath, id, name, proprietor, remarks) {
+  console.log(newDataPath);
+  mspId = newDataPath.mspId;
+  cryptoPath = path.resolve(newDataPath.dirName);
+  keyDirectoryPath = path.resolve(cryptoPath, newDataPath.keyPath);
+  certDirectoryPath = path.resolve(cryptoPath, newDataPath.certPath);
+  tlsCertPath = path.resolve(cryptoPath, newDataPath.tlsPath);
+  peerEndpoint = newDataPath.peerPoint;
+  peerHostAlias = newDataPath.peerHost;
+  await displayInputParameters();
+  const client = await newGrpcConnection();
+
+  const gateway = connect({
+    client,
+    identity: await newIdentity(),
+    signer: await newSigner(),
+    evaluateOptions: () => {
+      return { deadline: Date.now() + 5000 };
+    },
+    endorseOptions: () => {
+      return { deadline: Date.now() + 15000 };
+    },
+    submitOptions: () => {
+      return { deadline: Date.now() + 5000 };
+    },
+    commitStatusOptions: () => {
+      return { deadline: Date.now() + 60000 };
+    },
+  });
+
+  try {
+    const network = gateway.getNetwork(channelName);
+    const contract = network.getContract(chaincodeName);
+    await createLicense(contract, id, name, proprietor, remarks);
+  } finally {
+    gateway.close();
+    client.close();
+  }
+}
+
 async function newGrpcConnection() {
   const tlsRootCert = await fs.readFile(tlsCertPath);
   const tlsCredentials = grpc.credentials.createSsl(tlsRootCert);
@@ -167,4 +207,4 @@ async function displayInputParameters() {
   console.log(`peerHostAlias:     ${peerHostAlias}`);
 }
 
-module.exports = { getLicenses };
+module.exports = { getLicenses,createLicenseCall };
