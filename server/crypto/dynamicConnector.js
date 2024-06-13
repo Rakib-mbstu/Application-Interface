@@ -12,36 +12,21 @@ const chaincodeName = envOrDefault("CHAINCODE_NAME", "basic");
 let mspId = envOrDefault("MSP_ID", "Org1MSP");
 
 //dirName
-let cryptoPath = envOrDefault(
-  "CRYPTO_PATH",
-  path.resolve(
-    __dirname,
-    "../../../../test-network/organizations/peerOrganizations/org1.example.com"
-  )
-);
+let cryptoPath;
 
 //keyPath
-let keyDirectoryPath = envOrDefault(
-  "KEY_DIRECTORY_PATH",
-  path.resolve(cryptoPath, "users/User1@org1.example.com/msp/keystore")
-);
+let keyDirectoryPath;
 
 //certPath
-let certDirectoryPath = envOrDefault(
-  "CERT_DIRECTORY_PATH",
-  path.resolve(cryptoPath, "users/User1@org1.example.com/msp/signcerts")
-);
+let certDirectoryPath;
 
 //tlsPath
-let tlsCertPath = envOrDefault(
-  "TLS_CERT_PATH",
-  path.resolve(cryptoPath, "peers/peer0.org1.example.com/tls/ca.crt")
-);
+let tlsCertPath;
 
 //peerPoint
-let peerEndpoint = envOrDefault("PEER_ENDPOINT", "localhost:7051");
+let peerEndpoint;
 //peerHost
-let peerHostAlias = envOrDefault("PEER_HOST_ALIAS", "peer0.org1.example.com");
+let peerHostAlias;
 
 const utf8Decoder = new TextDecoder();
 
@@ -207,4 +192,4 @@ async function displayInputParameters() {
   console.log(`peerHostAlias:     ${peerHostAlias}`);
 }
 
-module.exports = { getLicenses,createLicenseCall };
+module.exports = { getLicenses, createLicenseCall };
