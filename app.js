@@ -48,7 +48,7 @@ const authMiddleware = (req, res, next) => {
 };
 
 // Route for the home page
-app.get(["/","/home"], async (req, res) => {
+app.get(["/", "/home"], async (req, res) => {
   //res.render("index", { title: "Home" });
   res.render("login");
 });
@@ -164,11 +164,18 @@ app.post("/approve", authMiddleware, async (req, res) => {
 //   res.send("done");
 // });
 
-app.get("/showCertificates", async (req, res) => {
-  const data = await cryptoPath.findById("666977c7b63ef75782c999b4");
-  console.log(data);
-  await dConnector.getLicenses(data);
-  res.send("done");
+app.get("/appLicenses",authMiddleware, async (req, res) => {
+  try {
+    const data = await cryptoPath.findById("666977c7b63ef75782c999b4");
+    console.log(data);
+    const allLicenses = await dConnector.getLicenses(data);
+    const licenses = allLicenses.flatMap((item) =>
+      Array.isArray(item) ? item : [item]
+    );
+    res.render("approvedLicense", { licenses });
+  } catch (e) {
+    res.send(e);
+  }
 });
 // Start the server
 app.listen(PORT, () => {

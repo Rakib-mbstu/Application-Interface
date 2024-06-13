@@ -166,7 +166,7 @@ async function initLedger(contract) {
 
 async function GetAllLicenses(contract) {
   console.log(
-    "\n--> Evaluate Transaction: GetAllAssets, function returns all the current assets on the ledger"
+    "\n--> Evaluate Transaction: GetAllLicenses, function returns all the current Licenses on the ledger"
   );
 
   const resultBytes = await contract.evaluateTransaction("GetAllLicenses");
@@ -178,7 +178,7 @@ async function GetAllLicenses(contract) {
 
 async function createLicense(contract, id, name, proprietor, remarks) {
   console.log(
-    "\n--> Submit Transaction: CreateAsset, creates new asset with ID, Name, Remarks and Certifier arguments"
+    "\n--> Submit Transaction: CreateLicense, creates new License with ID, Name, Remarks and Certifier arguments"
   );
 
   await contract.submitTransaction(
