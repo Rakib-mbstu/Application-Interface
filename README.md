@@ -28,7 +28,7 @@ application-interface-
 
 ## How to use
 - Create a test network using [hyperledger test network](https://hyperledger-fabric.readthedocs.io/en/release-2.5/test_network.html)
-- Install  [chaincode]()
+- Install  [chaincode](https://github.com/Rakib-mbstu/chaincode-tradeLicense)
 - Run the application
 - Add the licensing path to the db using API(/addPath)
 ## License
