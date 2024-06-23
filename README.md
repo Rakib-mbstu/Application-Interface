@@ -5,8 +5,8 @@ Application Interface is an web application that connects hyperledger fabric blo
 ## Installation
 Clone the repository:
 
-    git clone https://github.com/Rakib-mbstu/application-interface-
-    cd application-interface-
+    git clone https://github.com/Rakib-mbstu/Application-Interface
+    cd Application-Interface
 Install the dependencies:
 
     npm install
