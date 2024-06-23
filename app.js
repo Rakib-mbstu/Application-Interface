@@ -143,10 +143,11 @@ app.post("/approve", authMiddleware, async (req, res) => {
 
 //addPath
 // app.post("/addPath", async (req, res) => {
-//   const { mspId, dirName, keyPath, certPath, tlsPath, peerPoint, peerHost } =
+//   const {userId, mspId, dirName, keyPath, certPath, tlsPath, peerPoint, peerHost } =
 //     req.body;
 //   try {
 //     const newPath = new cryptoPath({
+//       userId:userId,
 //       mspId: mspId,
 //       dirName: dirName,
 //       keyPath: keyPath,
