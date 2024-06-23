@@ -17,7 +17,7 @@ To start the development server, run:
 
 ## Project Structure
 
-application-interface-  
+Application-Interface  
 ├── app.js  
 ├── package.json  
 ├── node_modules  
